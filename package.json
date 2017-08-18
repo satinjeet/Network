@@ -1,0 +1,30 @@
+{
+  "name": "Network",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@types/codemirror": "0.0.45",
+    "@types/react": "^16.0.2",
+    "@types/react-dom": "^15.5.3",
+    "@types/snapsvg": "^0.4.29",
+    "codemirror": "^5.28.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "snapsvg": "^0.5.1"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.2.3",
+    "source-map-loader": "^0.2.1",
+    "ts-loader": "^2.2.0",
+    "typescript": "^2.4.2",
+    "webpack": "^3.0.0",
+    "webpack-dev-middleware": "^1.11.0",
+    "webpack-dev-server": "^2.5.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
