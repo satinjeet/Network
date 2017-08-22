@@ -10,6 +10,17 @@ class Console extends React.Component<any, any> {
         cmInitialized: false
     }
 
+    props = {
+        commandHook: undefined
+    }
+
+    keyPress = (e: any) => {
+        if (e.key == 'Enter') {
+            this.props.commandHook(e.currentTarget.value);
+            e.currentTarget.value = null;
+        }
+    }
+
     onClose = (e) => {
         e.preventDefault();
         this.setState({ open: false });
@@ -21,7 +32,8 @@ class Console extends React.Component<any, any> {
                     <a className="close" href="#" onClick={this.onClose}>
                         <i className="fa fa-window-close" aria-hidden="true"></i>
                     </a>
-                    <textarea></textarea>
+                    <div contentEditable={true}></div>
+                    <input type="text" onKeyPress={this.keyPress}/>
                 </div>
         ) : null;
     }
@@ -30,9 +42,9 @@ class Console extends React.Component<any, any> {
         this.setState({open: true});
         if (this.state.open && !this.state.cmInitialized) {
             let t = ReactDOM.findDOMNode(this).querySelector('textarea');
-            CodeMirror.fromTextArea(t, {
-                lineNumbers: false
-            });
+            // CodeMirror.fromTextArea(t, {
+            //     lineNumbers: false
+            // });
         }
     }
 }
@@ -42,7 +54,11 @@ export class BasicOS {
     private closed;
 
     constructor() {
-        this.gui = ReactDOM.render(<Console/>, document.querySelector('#reactWrapper'));
+        this.gui = ReactDOM.render(<Console commandHook={this.commandReceived}/>, document.querySelector('#reactWrapper'));
+    }
+
+    commandReceived = (command: string) => {
+        console.log('Recieved Command : ', command);
     }
 
     display() {
