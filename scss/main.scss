@@ -1,0 +1,10 @@
+$fa-font-path: "~font-awesome/fonts";
+@import "~font-awesome/scss/font-awesome";
+@import "~codemirror/lib/codemirror";
+@import "~codemirror/theme/3024-night.css";
+
+@import 'components/os';
+
+#reactWrapper {
+  position: absolute;
+}

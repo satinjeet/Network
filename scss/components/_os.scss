@@ -1,0 +1,15 @@
+.console {
+  display: block;
+  width: 500px;
+  background: rgba(0,0,0,0.6);
+  padding: 5px;
+  
+  a.close {
+    position: absolute;
+    z-index: 1;
+    float: right;
+    top: -2px;
+    right: 0px;
+    color: #FF6767;
+  }
+}
