@@ -1,10 +1,15 @@
 $fa-font-path: "~font-awesome/fonts";
 @import "~font-awesome/scss/font-awesome";
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
 @import "~codemirror/lib/codemirror";
 @import "~codemirror/theme/3024-night.css";
 
-@import 'components/os';
+@import "components/mixins/mixins";
 
-#reactWrapper {
+@import 'components/os';
+@import 'components/menu';
+
+#reactWrapper, #menuWrappper {
   position: absolute;
 }

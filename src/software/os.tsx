@@ -1,21 +1,44 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as CodeMirror from "codemirror";
+import {Device} from "../hardware/basic_box";
 
+export interface OSGUI {
 
-class Console extends React.Component<any, any> {
+}
 
-    state = {
-        open: false,
-        cmInitialized: false
-    }
+interface State {
+    open: boolean;
+    cmInitialized: boolean;
+    output: string[];
+}
 
-    props = {
-        commandHook: undefined
+interface Props {
+    commandHook: Function;
+    device: Device;
+}
+
+class Console extends React.Component<Props, State> implements OSGUI {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            open: false,
+            cmInitialized: false,
+            output: [],
+        };
     }
 
     keyPress = (e: any) => {
         if (e.key == 'Enter') {
+            let newState = this.state.output;
+            newState.push(e.currentTarget.value);
+
+            this.setState({
+                output: newState
+            })
+
+            console.log(this.state)
             this.props.commandHook(e.currentTarget.value);
             e.currentTarget.value = null;
         }
@@ -29,11 +52,21 @@ class Console extends React.Component<any, any> {
     render() {
         return this.state.open ? (
                 <div className="console">
+                    <b>Session - {this.props.device.id}{this.props.device.name ? ` - ${this.props.device.name}`: ''}</b>
                     <a className="close" href="#" onClick={this.onClose}>
                         <i className="fa fa-window-close" aria-hidden="true"></i>
                     </a>
-                    <div contentEditable={true}></div>
-                    <input type="text" onKeyPress={this.keyPress}/>
+                    <br></br>
+                    <div>
+                        {
+                            this.state.output.map((_o, i) => {
+                                return <div key={i}>{_o}</div>
+                            })
+                        }
+                    </div>
+                    <span>
+                        sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
+                    </span>
                 </div>
         ) : null;
     }
@@ -41,7 +74,9 @@ class Console extends React.Component<any, any> {
     open() {
         this.setState({open: true});
         if (this.state.open && !this.state.cmInitialized) {
-            let t = ReactDOM.findDOMNode(this).querySelector('textarea');
+            let t: HTMLInputElement = ReactDOM.findDOMNode(this).querySelector('input.input-console') as HTMLInputElement;
+            t.focus();
+
             // CodeMirror.fromTextArea(t, {
             //     lineNumbers: false
             // });
@@ -49,12 +84,16 @@ class Console extends React.Component<any, any> {
     }
 }
 
-export class BasicOS {
-    private gui;
-    private closed;
+export interface OS {
+    gui: OSGUI;
 
-    constructor() {
-        this.gui = ReactDOM.render(<Console commandHook={this.commandReceived}/>, document.querySelector('#reactWrapper'));
+}
+
+export class BasicOS {
+    gui: any;
+
+    constructor(private machine: Device) {
+        this.gui = ReactDOM.render(<Console commandHook={this.commandReceived} device={this.machine}/>, document.querySelector('#reactWrapper'));
     }
 
     commandReceived = (command: string) => {

@@ -7,6 +7,7 @@ export interface Device {
     OS: BasicOS;
 
     id: string;
+    name: string;
 
     x: number;
 
@@ -14,8 +15,9 @@ export interface Device {
 }
 
 export class BasicBox {
-    OS: BasicOS = new BasicOS;
+    public OS: BasicOS = new BasicOS(this);
     public id: string = generateHDWId();
+    public name: string = "";
     public connection: NetworkMedium[] = [];
 
     private inst: Snap.Element;
@@ -32,28 +34,31 @@ export class BasicBox {
         let statusBox = undefined;
         let cable: Cable;
 
-        this.inst =  this.stage.rect(this.x, this.y, 100, 50);
-        this.inst.click((e) => {
+        this.inst = this.stage.rect(this.x, this.y, 100, 50);
+
+        this.inst.node.addEventListener('contextmenu', (e: MouseEvent) => {
             e.stopPropagation();
+            e.preventDefault();
             this.OS.display();
         })
 
-        this.inst.node.addEventListener('contextmenu', (e: MouseEvent) => {
-            e.preventDefault();
-
-            if (Memory.mem['pendingConnection']) {
-                cable = Memory.mem['pendingConnection']
-                cable.add(this);
-                delete Memory.mem['pendingConnection'];
-                Memory.add(`Connection-${cable.devices[0].id}-${cable.devices[1].id}`, cable);
-            } else {
-                cable = new Cable();
-                cable.add(this);
-                Memory.add('pendingConnection', cable);
-            }
-            this.connection.push(cable);
-            console.log(Memory.mem)
-        })
+        // this.inst.click((e) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //
+        //     if (Memory.mem['pendingConnection']) {
+        //         cable = Memory.mem['pendingConnection']
+        //         cable.add(this);
+        //         delete Memory.mem['pendingConnection'];
+        //         Memory.add(`Connection-${cable.devices[0].id}-${cable.devices[1].id}`, cable);
+        //     } else {
+        //         cable = new Cable();
+        //         cable.add(this);
+        //         Memory.add('pendingConnection', cable);
+        //     }
+        //     this.connection.push(cable);
+        //     console.log(Memory.mem)
+        // })
 
         this.inst.mouseover((e: MouseEvent) => {
             showStatus = true;
@@ -74,6 +79,18 @@ export class BasicBox {
             }
             statusBox.move(e.clientX, e.clientY);
         })
+
+        this.inst.drag(this.move, this.start, undefined);
+    }
+
+    move = (dx, dy) => {
+        this.inst.attr({
+            transform: this.inst.data('origTransform') + (this.inst.data('origTransform') ? "T" : "t") + [dx, dy]
+        });
+    }
+
+    start = () => {
+        this.inst.data('origTransform', this.inst.transform().local);
     }
 }
 
