@@ -4,20 +4,34 @@
   width: 500px;
   background: rgba(0,0,0,0.6);
   padding: 5px;
-  
-  a.close {
-    position: absolute;
-    z-index: 1;
-    float: right;
-    top: -2px;
-    right: 0px;
-    color: #FF6767;
-  }
 
   input.input-console {
     background: transparent;
     border: none;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
 
     &:focus { outline: none; }
+  }
+}
+
+.actions-bar {
+  min-height: 25px;
+  background: #c2c2c2;
+  display: inline-block;
+  width: 100%;
+
+  a.close {
+    position: absolute;
+    z-index: 1;
+    float: right;
+    right: 0px;
+    color: #620912;
+    font-size: 24px;
+    @include transition(color 0.2s);
+
+    &:hover {
+      color: #9C0912;
+    }
   }
 }

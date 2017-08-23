@@ -18,6 +18,26 @@ interface Props {
     device: Device;
 }
 
+interface ActionBarProps {
+    closeHook: Function;
+}
+
+class ActionsBar extends React.Component<ActionBarProps, any> {
+
+    onClose = (e) => {
+        e.preventDefault();
+        this.props.closeHook(e);
+    }
+
+    render() {
+        return <div className="actions-bar">
+            <a className="close" href="#" onClick={this.onClose}>
+                <i className="fa fa-window-close" aria-hidden="true"></i>
+            </a>
+        </div>
+    }
+}
+
 class Console extends React.Component<Props, State> implements OSGUI {
 
     constructor(props) {
@@ -51,22 +71,23 @@ class Console extends React.Component<Props, State> implements OSGUI {
 
     render() {
         return this.state.open ? (
-                <div className="console">
-                    <b>Session - {this.props.device.id}{this.props.device.name ? ` - ${this.props.device.name}`: ''}</b>
-                    <a className="close" href="#" onClick={this.onClose}>
-                        <i className="fa fa-window-close" aria-hidden="true"></i>
-                    </a>
-                    <br></br>
-                    <div>
-                        {
-                            this.state.output.map((_o, i) => {
-                                return <div key={i}>{_o}</div>
-                            })
-                        }
+                <div>
+                    <ActionsBar closeHook={this.onClose}/>
+                    <div className="console">
+                        <b>Connected Session - {this.props.device.id}{this.props.device.name ? ` - ${this.props.device.name}`: ''}</b>
+                        <br></br>
+                        <div>
+                            {
+                                this.state.output.map((_o, i) => {
+                                    return <div key={i}>{_o}</div>
+                                })
+                            }
+                        </div>
+                        <span>
+                            sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$
+                            <input type="text" className="input-console" onKeyPress={this.keyPress}/>
+                        </span>
                     </div>
-                    <span>
-                        sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
-                    </span>
                 </div>
         ) : null;
     }
