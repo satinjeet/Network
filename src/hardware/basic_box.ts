@@ -15,7 +15,7 @@ export interface Device {
 }
 
 export class BasicBox {
-    public OS: BasicOS = new BasicOS(this);
+    public OS: BasicOS;
     public id: string = generateHDWId();
     public name: string = getRandomName();
     public connection: NetworkMedium[] = [];
@@ -24,6 +24,7 @@ export class BasicBox {
 
     constructor(private stage: Snap.Paper, public x: number, public y: number) {
         this.render();
+        this.OS = new BasicOS(this);
 
         Memory.add(this.id, this);
     }

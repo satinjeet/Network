@@ -118,7 +118,7 @@ export class BasicOS extends Kernal implements  OS {
     }
 
     commandReceived = (command: string) => {
-        console.log('Recieved Command : ', command);
+        console.log('Received Command : ', command);
         return this.execute(command);
     }
 
