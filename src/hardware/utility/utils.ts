@@ -1,3 +1,5 @@
+import random_names from "./random_names";
+
 let set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 export function generateID(length: number = 8, characterSet: string = set) {
@@ -8,4 +10,8 @@ export function generateHDWId() {
     let id = generateID(8, 'ABCDE0123456789');
 
     return `${id[0]}${id[1]}:${id[2]}${id[3]}:${id[4]}${id[5]}:${id[6]}${id[7]}`;
+}
+
+export function getRandomName() {
+    return random_names[Math.floor(Math.random() * random_names.length)];
 }

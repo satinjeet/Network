@@ -19,6 +19,10 @@ export class Memory {
 
 export class World {
     static messageBox = undefined;
+
+    static stage() {
+        return l;
+    }
 }
 
 Object.defineProperty(window, 'MemoryAPP', {value: Memory});

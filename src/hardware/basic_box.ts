@@ -1,6 +1,6 @@
 import {BasicOS} from "../software/os";
-import {generateHDWId} from "./utility/utils";
-import {Memory} from "../index";
+import {generateHDWId, getRandomName} from "./utility/utils";
+import {Memory, World} from "../index";
 import {Cable, NetworkMedium} from "./network/cable";
 
 export interface Device {
@@ -17,11 +17,10 @@ export interface Device {
 export class BasicBox {
     public OS: BasicOS = new BasicOS(this);
     public id: string = generateHDWId();
-    public name: string = "";
+    public name: string = getRandomName();
     public connection: NetworkMedium[] = [];
 
     private inst: Snap.Element;
-
 
     constructor(private stage: Snap.Paper, public x: number, public y: number) {
         this.render();
@@ -34,7 +33,12 @@ export class BasicBox {
         let statusBox = undefined;
         let cable: Cable;
 
-        this.inst = this.stage.rect(this.x, this.y, 100, 50);
+        let rect = World.stage().rect(this.x, this.y, 100, 50);
+        rect.attr({stroke: '#C7C7C7', strokeWidth: 2, fill: "#CACACA"});
+
+        let light = World.stage().circle(this.x + 5, this.y + 25, 3);
+        light.attr({stroke: '#AA55AA', strokeWidth: 1, fill: '#55FF55'});
+        this.inst = World.stage().group(rect, light);
 
         this.inst.node.addEventListener('contextmenu', (e: MouseEvent) => {
             e.stopPropagation();
@@ -64,7 +68,7 @@ export class BasicBox {
             showStatus = true;
             if (statusBox) return;
 
-            statusBox = new Status(this.stage, e.clientX, e.clientY);
+            statusBox = new Status(this, e.clientX, e.clientY);
             statusBox.render();
         });
         this.inst.mouseout((e: MouseEvent) => {
@@ -100,7 +104,7 @@ class Status {
     private text: Snap.Element;
     private box: Snap.Element;
 
-    constructor(private stage: Snap.Paper, private x: number, private y: number) {
+    constructor(private device: Device, private x: number, private y: number) {
         this.x += 20;
         this.y += 20;
     }
@@ -112,10 +116,11 @@ class Status {
     }
 
     render() {
-        this.box = this.stage.rect(this.x, this.y, 200, 100);
+        this.box = World.stage().rect(this.x, this.y, 200, 100);
         this.box.attr({ fill: "white", opacity: "0.4", stroke: "black", strokeWidth: "2" });
-        this.text = this.stage.text(this.x, this.y + 20, "Nothing for now");
-        this.inst = this.stage.group(this.box, this.text);
+        this.text = World.stage().text(this.x + 5, this.y + 20, this.device.name);
+        this.text.attr({fontFamily: 'monospace'});
+        this.inst = World.stage().group(this.box, this.text);
 
     }
 
