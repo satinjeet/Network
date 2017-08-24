@@ -3,6 +3,9 @@ import {BasicBox} from "./hardware/basic_box";
 import * as ReactDOM from "react-dom";
 import {Menu} from "./appui/menu";
 import * as React from "react";
+import {Messagebox} from "./appui/messagebox";
+import {World} from "./index";
+
 
 export function registerEvents(canvas: Snap.Paper) {
     // canvas.click((e: MouseEvent) => {
@@ -24,5 +27,13 @@ export function registerEvents(canvas: Snap.Paper) {
                 }
             }
         ),
-        document.querySelector('#menuWrappper'))
+        document.querySelector('#menuWrappper')
+    )
+
+    World.messageBox = ReactDOM.render(
+        React.createElement(
+            Messagebox
+        ),
+        document.querySelector('#genericRoot')
+    )
 }

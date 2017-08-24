@@ -1,0 +1,14 @@
+#genericRoot {
+  font-family: 'Oswald', sans-serif;
+  .message-box {
+    position: fixed;
+    width: 50%;
+    left: 25%;
+    text-align: center;
+
+    border: 1px solid #C9C9C9;
+    @include border-right-radius(5px);
+    @include border-top-radius(5px);
+    padding: 3px 5px;
+  }
+}
