@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as CodeMirror from "codemirror";
 import {Device} from "../hardware/basic_box";
+import {Kernal} from "./kernal/command";
 
 export interface OSGUI {
 
@@ -10,7 +11,7 @@ export interface OSGUI {
 interface State {
     open: boolean;
     cmInitialized: boolean;
-    output: string[];
+    output: {__html: string}[];
 }
 
 interface Props {
@@ -52,14 +53,13 @@ class Console extends React.Component<Props, State> implements OSGUI {
     keyPress = (e: any) => {
         if (e.key == 'Enter') {
             let newState = this.state.output;
-            newState.push(e.currentTarget.value);
+            newState.push(this.props.commandHook(e.currentTarget.value));
 
             this.setState({
                 output: newState
             })
 
             console.log(this.state)
-            this.props.commandHook(e.currentTarget.value);
             e.currentTarget.value = null;
         }
     }
@@ -79,13 +79,12 @@ class Console extends React.Component<Props, State> implements OSGUI {
                         <div>
                             {
                                 this.state.output.map((_o, i) => {
-                                    return <div key={i}>{_o}</div>
+                                    return <div key={i} dangerouslySetInnerHTML={_o}></div>
                                 })
                             }
                         </div>
                         <span>
-                            sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$
-                            <input type="text" className="input-console" onKeyPress={this.keyPress}/>
+                            sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
                         </span>
                     </div>
                 </div>
@@ -110,15 +109,17 @@ export interface OS {
 
 }
 
-export class BasicOS {
+export class BasicOS extends Kernal implements  OS {
     gui: any;
 
     constructor(private machine: Device) {
+        super();
         this.gui = ReactDOM.render(<Console commandHook={this.commandReceived} device={this.machine}/>, document.querySelector('#reactWrapper'));
     }
 
     commandReceived = (command: string) => {
         console.log('Recieved Command : ', command);
+        return this.execute(command);
     }
 
     display() {
