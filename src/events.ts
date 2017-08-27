@@ -5,6 +5,8 @@ import {Menu} from "./appui/menu";
 import * as React from "react";
 import {Messagebox} from "./appui/messagebox";
 import {World} from "./index";
+import {OSWrapper} from "./appui/os_wrapper";
+import {Cable} from "./hardware/network/cable";
 
 
 export function registerEvents(canvas: Snap.Paper) {
@@ -23,7 +25,7 @@ export function registerEvents(canvas: Snap.Paper) {
                     new BasicBox(canvas, window.innerWidth / 2, window.innerHeight/2);
                 },
                 eventAddConnection: (e) => {
-                    console.log('impl pending');
+                    new Cable()
                 }
             }
         ),
@@ -35,5 +37,12 @@ export function registerEvents(canvas: Snap.Paper) {
             Messagebox
         ),
         document.querySelector('#genericRoot')
+    )
+
+    World.osLayer = ReactDOM.render(
+        React.createElement(
+            OSWrapper
+        ),
+        document.querySelector('#reactWrapper')
     )
 }

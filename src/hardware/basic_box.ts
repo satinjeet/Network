@@ -12,13 +12,24 @@ export interface Device {
     x: number;
 
     y: number;
+
+    dx: number;
+    dy: number;
+
+    connection: NetworkMedium[];
+
+    pauseEvent();
+
+    readonly position: {x:number, y: number};
 }
 
-export class BasicBox {
+export class BasicBox implements Device {
     public OS: BasicOS;
     public id: string = generateHDWId();
     public name: string = getRandomName();
     public connection: NetworkMedium[] = [];
+    public dx: number = 0;
+    public dy: number = 0;
 
     private inst: Snap.Element;
 
@@ -27,6 +38,17 @@ export class BasicBox {
         this.OS = new BasicOS(this);
 
         Memory.add(this.id, this);
+    }
+
+    get position(): {x: number, y: number} {
+        return {
+            x: this.x + this.dx,
+            y: this.y + this.dy
+        }
+    }
+
+    set position(args) {
+        throw new Error('Position in read only')
     }
 
     render() {
@@ -42,28 +64,27 @@ export class BasicBox {
         this.inst = World.stage().group(rect, light);
 
         this.inst.node.addEventListener('contextmenu', (e: MouseEvent) => {
+            if (this.pauseEvent()) return;
             e.stopPropagation();
             e.preventDefault();
             this.OS.display();
         })
 
-        // this.inst.click((e) => {
-        //     e.preventDefault();
-        //     e.stopPropagation();
-        //
-        //     if (Memory.mem['pendingConnection']) {
-        //         cable = Memory.mem['pendingConnection']
-        //         cable.add(this);
-        //         delete Memory.mem['pendingConnection'];
-        //         Memory.add(`Connection-${cable.devices[0].id}-${cable.devices[1].id}`, cable);
-        //     } else {
-        //         cable = new Cable();
-        //         cable.add(this);
-        //         Memory.add('pendingConnection', cable);
-        //     }
-        //     this.connection.push(cable);
-        //     console.log(Memory.mem)
-        // })
+        this.inst.click((e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            /**
+             * no connection is being created, do not care for this event.
+             */
+            if (!World.pendingConnection) return;
+
+            if (World.pendingConnection) {
+                Memory.mem['pendingConnection'].add(this);
+                this.connection.push(Memory.mem['pendingConnection']);
+                console.log(Memory.mem)
+            }
+        })
 
         this.inst.mouseover((e: MouseEvent) => {
             showStatus = true;
@@ -88,14 +109,37 @@ export class BasicBox {
         this.inst.drag(this.move, this.start, undefined);
     }
 
+    redrawConnections() {
+        this.connection.forEach((_con) => {
+            _con.render();
+        })
+    }
+
     move = (dx, dy) => {
+        if (this.pauseEvent()) return;
+        this.dx = dx;
+        this.dy = dy;
         this.inst.attr({
             transform: this.inst.data('origTransform') + (this.inst.data('origTransform') ? "T" : "t") + [dx, dy]
         });
+        this.redrawConnections();
     }
 
     start = () => {
+        if (this.pauseEvent()) return;
         this.inst.data('origTransform', this.inst.transform().local);
+    }
+
+    pauseEvent() {
+        /**
+         * if certain events happen then ignore clicks, drag etc etc.
+         */
+        if (World.pendingConnection) {
+            World.messageBox.setMessage("You are currently in connection mode, select devices to finish the connection");
+            return true;
+        }
+
+        return false;
     }
 }
 

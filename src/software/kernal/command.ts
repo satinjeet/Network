@@ -2,7 +2,7 @@ export enum Commands {
     COMMAND_HELP
 }
 
-interface DangerousHTML {
+export interface DangerousHTML {
     __html: string;
 }
 

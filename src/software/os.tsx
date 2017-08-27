@@ -2,7 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as CodeMirror from "codemirror";
 import {Device} from "../hardware/basic_box";
-import {Kernal} from "./kernal/command";
+import {DangerousHTML, Kernal} from "./kernal/command";
+import {World} from "../index";
 
 export interface OSGUI {
 
@@ -39,7 +40,7 @@ class ActionsBar extends React.Component<ActionBarProps, any> {
     }
 }
 
-class Console extends React.Component<Props, State> implements OSGUI {
+export class Console extends React.Component<Props, State> implements OSGUI {
 
     constructor(props) {
         super(props);
@@ -48,6 +49,7 @@ class Console extends React.Component<Props, State> implements OSGUI {
             cmInitialized: false,
             output: [],
         };
+        this.props.device.OS.gui = this;
     }
 
     keyPress = (e: any) => {
@@ -84,7 +86,7 @@ class Console extends React.Component<Props, State> implements OSGUI {
                             }
                         </div>
                         <span>
-                            sess-{ this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
+                            { this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
                         </span>
                     </div>
                 </div>
@@ -104,20 +106,42 @@ class Console extends React.Component<Props, State> implements OSGUI {
     }
 }
 
-export interface OS {
-    gui: OSGUI;
-
+export enum OS_MODES {
+    MODE_GUI,
+    MODE_CONSOLE
 }
 
-export class BasicOS extends Kernal implements  OS {
-    gui: any;
+export interface OS {
+    gui: OSGUI;
+    mode: OS_MODES;
+    machine: Device;
+    nmapTimer: any;
 
-    constructor(private machine: Device) {
+    commandReceived(command: string): DangerousHTML;
+
+    display();
+
+    console();
+
+    network();
+}
+
+export class BasicOS extends Kernal implements OS {
+    gui: any;
+    mode = OS_MODES.MODE_CONSOLE;
+    nmapTimer: any;
+    ttyl:number =  5*1000;
+
+    constructor(public machine: Device) {
         super();
-        this.gui = ReactDOM.render(<Console commandHook={this.commandReceived} device={this.machine}/>, document.querySelector('#reactWrapper'));
+        // this.gui = ReactDOM.render(
+        //     <Console commandHook={this.commandReceived} device={this.machine}/>,
+        //     document.querySelector('#reactWrapper')
+        // );
+        World.osLayer.addOs(this);
     }
 
-    commandReceived = (command: string) => {
+    commandReceived = (command: string): DangerousHTML => {
         console.log('Received Command : ', command);
         return this.execute(command);
     }
@@ -128,5 +152,14 @@ export class BasicOS extends Kernal implements  OS {
 
     console() {
         this.gui.open();
+    }
+
+    networkDriver = () => {
+
+    }
+
+    network() {
+
+        this.nmapTimer = setInterval(this.networkDriver, this.ttyl);
     }
 }
