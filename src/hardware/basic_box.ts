@@ -80,8 +80,8 @@ export class BasicBox implements Device {
             if (!World.pendingConnection) return;
 
             if (World.pendingConnection) {
-                Memory.mem['pendingConnection'].add(this);
-                this.connection.push(Memory.mem['pendingConnection']);
+                (Memory.mem['pendingConnection'] as Cable).add(this);
+                // this.connection.push(Memory.mem['pendingConnection']);
                 console.log(Memory.mem)
             }
         })
@@ -106,7 +106,7 @@ export class BasicBox implements Device {
             statusBox.move(e.clientX, e.clientY);
         })
 
-        this.inst.drag(this.move, this.start, undefined);
+        this.inst.drag(this.move, this.start, this.stop);
     }
 
     redrawConnections() {
@@ -128,6 +128,14 @@ export class BasicBox implements Device {
     start = () => {
         if (this.pauseEvent()) return;
         this.inst.data('origTransform', this.inst.transform().local);
+    }
+
+    stop = () => {
+        this.x = this.x + this.dx;
+        this.y = this.y + this.dy;
+
+        this.dx = 0;
+        this.dy = 0;
     }
 
     pauseEvent() {
@@ -166,7 +174,6 @@ class Status {
         this.text = World.stage().text(this.x + 5, this.y + 20, this.device.name);
         this.text.attr({fontFamily: 'monospace'});
         this.inst = World.stage().group(this.box, this.text);
-
     }
 
     destroy() {

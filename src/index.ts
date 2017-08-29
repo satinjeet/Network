@@ -30,7 +30,7 @@ export class Memory {
 export class World {
     static messageBox: Messagebox = undefined;
     static osLayer = undefined;
-
+    
     static pendingConnection: boolean = false;
 
     static stage() {

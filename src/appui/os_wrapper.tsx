@@ -1,6 +1,8 @@
 
-import {Console, OS, OS_MODES, OSGUI} from "../software/os";
+import {OS_MODES} from "../software/os";
 import * as React from "react";
+import {Console} from "../software/common/console";
+import {OS} from "../software/base/os";
 
 interface State {
     osList: OS[];

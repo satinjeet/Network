@@ -63,6 +63,9 @@ export class Cable implements NetworkMedium {
             Memory.remove('pendingConnection');
 
             Memory.add(`Cable-${Memory.getId()}`, this);
+            this.devices.forEach((_device: Device) => {
+                _device.connection.push(this);
+            })
             this.render();
         }
     }

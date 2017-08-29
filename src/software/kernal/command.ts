@@ -1,3 +1,5 @@
+import {TimedTasks} from "../base/clock";
+
 export enum Commands {
     COMMAND_HELP
 }
