@@ -10,15 +10,18 @@ export enum OS_MODES {
     MODE_CONSOLE
 }
 
-export class BasicOS extends Kernal implements OS {
+export class BasicOS extends Kernal implements OS, NetworkDriver {
+    networkMap: { addr: string; device: Device; }[] = [];
     gui: any;
     mode = OS_MODES.MODE_CONSOLE;
     nmapTimer: any;
-    ttyl:number =  5*1000;
+    ttyl:number = 60*1000;
     private ttylCache: number;
 
     constructor(public machine: Device) {
-        super();
+        super(():void => {
+            this.nmap();
+        });
         World.osLayer.addOs(this);
         this.ttylCache = this.ttyl;
     }
@@ -36,25 +39,28 @@ export class BasicOS extends Kernal implements OS {
         this.gui.open();
     }
 
-    tick = ():void => {
-        // this.nmap();
+    nmap(force: boolean = false) {
+        this.ttylCache -= this.tickTimer;
+
+        if (this.ttylCache > 0 && !force) {
+            return;
+        }
+
+        this.ttylCache = this.ttyl;
+        this.networkMap = [];
+        let devList = this.machine.connection.map((_connection: NetworkMedium) => {
+            _connection.devices.map((_dev: Device) => {
+                if (_dev.id != this.machine.id) {
+                    this.networkMap.push({
+                        addr: _dev.id,
+                        device: _dev
+                    })
+                }
+            })
+        })
     }
 
-    // nmap() {
-    //     this.ttylCache -= this.tickTimer;
-    //
-    //     if (this.ttylCache > 0) {
-    //         return;
-    //     }
-    //
-    //
-    //     this.ttylCache = this.ttyl;
-    //     let devList = this.machine.connection.map((_connection: NetworkMedium) => {
-    //         return _connection.devices.filter((_dev: Device) => {
-    //             return _dev.id != this.machine.id;
-    //         })
-    //     })
-    //
-    //     console.log(devList);
-    // }
+    handlerInterrupt() {
+        this.nmap(true);
+    }
 }

@@ -59,12 +59,28 @@ export class Cable implements NetworkMedium {
          * TO-DO: try to render a dummy cable
          */
         if (this.devices.length == this.limit) {
+            /**
+             * let the world know that connection is established
+             * @type {boolean}
+             */
             World.pendingConnection = false;
-            Memory.remove('pendingConnection');
+            World.messageBox.setMessage('Cable Connected');
 
+            /**
+             * internal:
+             *
+             * remove buffer connection
+             * and add actual Cable connection
+             */
+            Memory.remove('pendingConnection');
             Memory.add(`Cable-${Memory.getId()}`, this);
+
+            /**
+             * register connection to each device.
+             */
             this.devices.forEach((_device: Device) => {
                 _device.connection.push(this);
+                _device.interrupt();
             })
             this.render();
         }

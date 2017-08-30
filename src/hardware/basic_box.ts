@@ -16,11 +16,19 @@ export interface Device {
     dx: number;
     dy: number;
 
+    /**
+     * to-do change to a more plausible Port map
+     */
     connection: NetworkMedium[];
 
     pauseEvent();
 
     readonly position: {x:number, y: number};
+
+    /**
+     * Recieve interrupts
+     */
+    interrupt();
 }
 
 export class BasicBox implements Device {
@@ -81,7 +89,6 @@ export class BasicBox implements Device {
 
             if (World.pendingConnection) {
                 (Memory.mem['pendingConnection'] as Cable).add(this);
-                // this.connection.push(Memory.mem['pendingConnection']);
                 console.log(Memory.mem)
             }
         })
@@ -148,6 +155,10 @@ export class BasicBox implements Device {
         }
 
         return false;
+    }
+
+    interrupt() {
+        this.OS.handlerInterrupt();
     }
 }
 

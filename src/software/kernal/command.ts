@@ -1,4 +1,5 @@
 import {TimedTasks} from "../base/clock";
+import {NetworkDriver, OS} from "../base/os";
 
 export enum Commands {
     COMMAND_HELP
@@ -9,13 +10,13 @@ export interface DangerousHTML {
 }
 
 interface Command {
-    execute(): DangerousHTML;
+    execute(os: any): DangerousHTML;
 
     displayHelp();
 }
 
 class HelpCommand implements Command {
-    execute(): DangerousHTML {
+    execute(os: OS): DangerousHTML {
         return {
             __html: `Current set of defined commands :
             <br> - ${CommandStructure.binaries.join('<br> - ')} 
@@ -25,6 +26,18 @@ class HelpCommand implements Command {
 
     displayHelp() {
         return `Use <i>help</i> to display available commands.`
+    }
+}
+
+class PingCommand implements Command {
+    execute(os: NetworkDriver) {
+        return {
+            __html: ""
+        }
+    }
+
+    displayHelp() {
+        return `Usage <i>ping &lr;device_id&gr; </i> to display available commands.`
     }
 }
 
@@ -45,12 +58,12 @@ export class CommandStructure {
     }
 }
 
-export abstract class Kernal {
+export abstract class Kernal extends TimedTasks {
 
     execute(command: string) {
         let executer = CommandStructure.supports(command) ? CommandStructure.map[command] : {};
 
-        return (new executer).execute();
+        return (new executer).execute(this);
     }
 
 }
