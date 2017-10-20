@@ -22,6 +22,13 @@
   background: #c2c2c2;
   display: inline-block;
   width: 100%;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 13px;
+  text-align: left;
+
+  b.title {
+    vertical-align: -webkit-baseline-middle;
+  }
 
   a.close {
     position: absolute;

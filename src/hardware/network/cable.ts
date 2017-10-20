@@ -1,5 +1,7 @@
 import {Device} from "../basic_box";
 import {Memory, World} from "../../index";
+import {EVENTS} from "../../software/hwInterrupts/events";
+import {NetworkDriver, Packet} from "../../software/base/os";
 
 export enum ConnectionType {
     ONE2ONE,
@@ -10,17 +12,27 @@ export enum ConnectionType {
 export interface NetworkMedium {
     devices: Device[];
     limit: number;
+    drivers: {
+        [id: string]: NetworkDriver;
+    };
 
     canHandleMoreDevices(): boolean;
 
     add(device: Device);
 
     render();
+
+    signal(data: Packet, device: Device);
 }
 
 export class Cable implements NetworkMedium {
 
+    signal(data: Packet, device: Device) {
+        this.drivers[device.id].receiveDataPacket(data);
+    }
+
     devices: Device[] = [];
+    drivers: {[id: string]: NetworkDriver} = {};
     inst: Snap.Element;
     limit: number = 2;
 
@@ -80,7 +92,7 @@ export class Cable implements NetworkMedium {
              */
             this.devices.forEach((_device: Device) => {
                 _device.connection.push(this);
-                _device.interrupt();
+                _device.interrupt(EVENTS.CONNECTION_ESTABLISHED);
             })
             this.render();
         }
@@ -100,5 +112,4 @@ export class Cable implements NetworkMedium {
         this.inst = Memory.stage().line(this.devices[0].position.x, this.devices[0].position.y, this.devices[1].position.x, this.devices[1].position.y);
         this.inst.attr({ stroke: '#000', strokeWidth: '2'})
     }
-
 }

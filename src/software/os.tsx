@@ -2,19 +2,21 @@ import * as React from 'react';
 import {Device} from "../hardware/basic_box";
 import {DangerousHTML, Kernal} from "./kernal/command";
 import {World} from "../index";
-import {NetworkDriver, OS} from "./base/os";
 import {NetworkMedium} from "../hardware/network/cable";
+import {Network, NetworkDriver, OS, Packet} from "./base/os";
+import {EthernetDriver} from "./common/enternetdriver";
+import {EVENTS} from "./hwInterrupts/events";
 
 export enum OS_MODES {
     MODE_GUI,
     MODE_CONSOLE
 }
 
-export class BasicOS extends Kernal implements OS, NetworkDriver {
-    networkMap: { addr: string; device: Device; }[] = [];
+export class BasicOS extends Kernal implements OS, Network {
+    networkMap: { addr: string, driver: NetworkDriver }[] = [];
+
     gui: any;
     mode = OS_MODES.MODE_CONSOLE;
-    nmapTimer: any;
     ttyl:number = 60*1000;
     private ttylCache: number;
 
@@ -26,7 +28,7 @@ export class BasicOS extends Kernal implements OS, NetworkDriver {
         this.ttylCache = this.ttyl;
     }
 
-    commandReceived = (command: string): DangerousHTML => {
+    commandReceived = (command: string): Promise<DangerousHTML> => {
         console.log('Received Command : ', command);
         return this.execute(command);
     }
@@ -53,14 +55,23 @@ export class BasicOS extends Kernal implements OS, NetworkDriver {
                 if (_dev.id != this.machine.id) {
                     this.networkMap.push({
                         addr: _dev.id,
-                        device: _dev
+                        driver: new EthernetDriver(_dev, this.machine, _connection)
                     })
                 }
             })
         })
     }
 
-    handlerInterrupt() {
+    handlerInterrupt(intr: EVENTS) {
+        console.log('revieved interrupt', intr);
         this.nmap(true);
+    }
+
+    createDataPacket(data: any): Packet {
+        return {
+            data,
+            sender: undefined,
+            receiver: undefined
+        } as Packet;
     }
 }

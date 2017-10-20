@@ -11,6 +11,9 @@ interface State {
 }
 
 interface Props {
+    /**
+     * change to Promise
+     */
     commandHook: Function;
     device: Device;
 }
@@ -20,24 +23,46 @@ export class Console extends React.Component<Props, State> implements OSGUI {
     constructor(props) {
         super(props);
         this.state = {
-            open: false,
+            open: true,
             cmInitialized: false,
             output: [],
         };
         this.props.device.OS.gui = this;
     }
 
+    get promptString(): string {
+        return `${this.props.device.name ? this.props.device.name: this.props.device.id }$ `;
+    }
+
     keyPress = (e: any) => {
+        e.persist();
+        let tBox = e.currentTarget;
+        let cmd = tBox.value;
+
         if (e.key == 'Enter') {
             let newState = this.state.output;
-            newState.push(this.props.commandHook(e.currentTarget.value));
+            this.props.commandHook(cmd).then((cmdOutput) => {
+                newState.push({
+                    __html: `${this.promptString}${cmd}`
+                })
+                newState.push(cmdOutput);
+                this.setState({
+                    output: newState
+                })
 
-            this.setState({
-                output: newState
+                console.log(this.state)
+                tBox.value = null;
+            }).catch(() => {
+                newState.push({
+                    __html: `${this.promptString}${cmd}`
+                })
+                newState.push({
+                    __html: `Execution failed : ${cmd}`
+                })
+                this.setState({
+                    output: newState
+                })
             })
-
-            console.log(this.state)
-            e.currentTarget.value = null;
         }
     }
 
@@ -49,9 +74,8 @@ export class Console extends React.Component<Props, State> implements OSGUI {
     render() {
         return this.state.open ? (
             <div>
-                <ActionsBar closeHook={this.onClose}/>
+                <ActionsBar closeHook={this.onClose} device={this.props.device}/>
                 <div className="console">
-                    <b>Connected Session - {this.props.device.id}{this.props.device.name ? ` - ${this.props.device.name}`: ''}</b>
                     <br></br>
                     <div>
                         {
@@ -61,8 +85,8 @@ export class Console extends React.Component<Props, State> implements OSGUI {
                         }
                     </div>
                     <span>
-                            { this.props.device.name ? this.props.device.name: this.props.device.id }$ <input type="text" className="input-console" onKeyPress={this.keyPress}/>
-                        </span>
+                        { this.promptString }<input type="text" className="input-console" onKeyPress={this.keyPress}/>
+                    </span>
                 </div>
             </div>
         ) : null;

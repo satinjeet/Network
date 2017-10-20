@@ -2,14 +2,14 @@ import {OS_MODES} from "../os";
 import {Device} from "../../hardware/basic_box";
 import {DangerousHTML} from "../kernal/command";
 import {NetworkMedium} from "../../hardware/network/cable";
+import {EVENTS} from "../hwInterrupts/events";
 
 export interface OS {
     gui: OSGUI;
     mode: OS_MODES;
     machine: Device;
-    nmapTimer: any;
 
-    commandReceived(command: string): DangerousHTML;
+    commandReceived(command: string): Promise<DangerousHTML>;
 
     display();
 
@@ -18,31 +18,32 @@ export interface OS {
     /**
      * handle hardware interrupts
      */
-    handlerInterrupt();
+    handlerInterrupt(intr: EVENTS);
 }
 
-interface Packet {
+export interface Packet {
     sender: string;
     receiver: string;
 
     data: any;
 }
 
-interface NetworkCard {
-    sendDataPacket(packet, connection: NetworkMedium);
+export interface NetworkDriver {
 
-    receiveDataPacket(packet, connectionNetworkMedium);
+    signPacket(packet: Packet): Packet;
+
+    sendDataPacket(packet);
+
+    receiveDataPacket(packet);
 }
 
-export interface NetworkDriver {
+export interface Network {
     /**
      * OS implementing Network Driver will maintain a Network map of connected devices.
      */
-    networkMap: {addr: string, device: Device}[];
+    networkMap: {addr: string, driver: NetworkDriver}[];
 
-    networkCards: NetworkCard[];
-
-    createDataPacket(data: any);
+    createDataPacket(data: any): Packet;
 }
 
 

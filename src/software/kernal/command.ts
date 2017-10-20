@@ -1,5 +1,6 @@
 import {TimedTasks} from "../base/clock";
-import {NetworkDriver, OS} from "../base/os";
+import {OS} from "../base/os";
+import {PingCommand} from "./commands/ping";
 
 export enum Commands {
     COMMAND_HELP
@@ -9,35 +10,25 @@ export interface DangerousHTML {
     __html: string;
 }
 
-interface Command {
-    execute(os: any): DangerousHTML;
+export interface Command {
+    execute(os: any): Promise<DangerousHTML>;
 
     displayHelp();
 }
 
 class HelpCommand implements Command {
-    execute(os: OS): DangerousHTML {
-        return {
-            __html: `Current set of defined commands :
-            <br> - ${CommandStructure.binaries.join('<br> - ')} 
-        `
-        }
+    execute(os: OS): Promise<DangerousHTML> {
+        return new Promise((res, rej) => {
+            res({
+                __html: `Current set of defined commands :
+                    <br> - ${CommandStructure.binaries.join('<br> - ')} 
+                `
+            })
+        });
     }
 
     displayHelp() {
         return `Use <i>help</i> to display available commands.`
-    }
-}
-
-class PingCommand implements Command {
-    execute(os: NetworkDriver) {
-        return {
-            __html: ""
-        }
-    }
-
-    displayHelp() {
-        return `Usage <i>ping &lr;device_id&gr; </i> to display available commands.`
     }
 }
 
@@ -50,20 +41,26 @@ export class CommandStructure {
     static map: Object = {
         'help': HelpCommand,
         'nmap': HelpCommand,
-        'ping': HelpCommand
+        'ping': PingCommand
     }
 
+    /**
+     * regex match
+     * @param {string} command
+     * @returns {boolean}
+     */
     static supports(command: string) {
-        return CommandStructure.binaries.indexOf(command) > -1;
+        let [commandName] = command.split(' ');
+        return CommandStructure.binaries.indexOf(commandName) > -1 ? CommandStructure.map[commandName]: HelpCommand;
     }
 }
 
 export abstract class Kernal extends TimedTasks {
 
-    execute(command: string) {
-        let executer = CommandStructure.supports(command) ? CommandStructure.map[command] : {};
+    execute(command: string): Promise<DangerousHTML> {
+        let executer = CommandStructure.supports(command);
 
-        return (new executer).execute(this);
+        return (new executer(command)).execute(this);
     }
 
 }

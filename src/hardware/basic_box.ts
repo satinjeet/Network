@@ -2,6 +2,7 @@ import {BasicOS} from "../software/os";
 import {generateHDWId, getRandomName} from "./utility/utils";
 import {Memory, World} from "../index";
 import {Cable, NetworkMedium} from "./network/cable";
+import {EVENTS} from "../software/hwInterrupts/events";
 
 export interface Device {
     OS: BasicOS;
@@ -28,7 +29,7 @@ export interface Device {
     /**
      * Recieve interrupts
      */
-    interrupt();
+    interrupt(intr: EVENTS);
 }
 
 export class BasicBox implements Device {
@@ -157,8 +158,8 @@ export class BasicBox implements Device {
         return false;
     }
 
-    interrupt() {
-        this.OS.handlerInterrupt();
+    interrupt(intr: EVENTS) {
+        this.OS.handlerInterrupt(intr);
     }
 }
 
