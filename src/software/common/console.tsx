@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Device} from "../../hardware/basic_box";
+import {IDevice} from "../../hardware/interfaces/IDevice";
 import {ActionsBar} from "./actionbar";
 import {OSGUI} from "../base/os";
 import * as ReactDOM from "react-dom";
@@ -15,7 +15,7 @@ interface Props {
      * change to Promise
      */
     commandHook: Function;
-    device: Device;
+    device: IDevice;
 }
 
 export class Console extends React.Component<Props, State> implements OSGUI {

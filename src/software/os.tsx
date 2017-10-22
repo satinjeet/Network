@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {Device} from "../hardware/basic_box";
+import {IDevice} from "../hardware/interfaces/IDevice";
 import {DangerousHTML, Kernal} from "./kernal/command";
 import {World} from "../index";
-import {NetworkMedium} from "../hardware/network/cable";
+import {INetworkMedium} from "../hardware/interfaces/INetworkMedium";
 import {Network, NetworkDriver, OS, Packet} from "./base/os";
 import {EthernetDriver} from "./common/enternetdriver";
 import {EVENTS} from "./hwInterrupts/events";
@@ -20,7 +20,7 @@ export class BasicOS extends Kernal implements OS, Network {
     ttyl:number = 60*1000;
     private ttylCache: number;
 
-    constructor(public machine: Device) {
+    constructor(public machine: IDevice) {
         super(():void => {
             this.nmap();
         });
@@ -50,8 +50,8 @@ export class BasicOS extends Kernal implements OS, Network {
 
         this.ttylCache = this.ttyl;
         this.networkMap = [];
-        let devList = this.machine.connection.map((_connection: NetworkMedium) => {
-            _connection.devices.map((_dev: Device) => {
+        let devList = this.machine.connection.map((_connection: INetworkMedium) => {
+            _connection.devices.map((_dev: IDevice) => {
                 if (_dev.id != this.machine.id) {
                     this.networkMap.push({
                         addr: _dev.id,

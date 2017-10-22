@@ -1,42 +1,17 @@
 import {BasicOS} from "../software/os";
 import {generateHDWId, getRandomName} from "./utility/utils";
 import {Memory, World} from "../index";
-import {Cable, NetworkMedium} from "./network/cable";
+import {Cable} from "./network/cable";
 import {EVENTS} from "../software/hwInterrupts/events";
+import {Packet} from "../software/base/os";
+import {IDevice} from "./interfaces/IDevice";
+import {INetworkMedium} from "./interfaces/INetworkMedium";
 
-export interface Device {
-    OS: BasicOS;
-
-    id: string;
-    name: string;
-
-    x: number;
-
-    y: number;
-
-    dx: number;
-    dy: number;
-
-    /**
-     * to-do change to a more plausible Port map
-     */
-    connection: NetworkMedium[];
-
-    pauseEvent();
-
-    readonly position: {x:number, y: number};
-
-    /**
-     * Recieve interrupts
-     */
-    interrupt(intr: EVENTS);
-}
-
-export class BasicBox implements Device {
+export class BasicBox implements IDevice {
     public OS: BasicOS;
     public id: string = generateHDWId();
     public name: string = getRandomName();
-    public connection: NetworkMedium[] = [];
+    public connection: INetworkMedium[] = [];
     public dx: number = 0;
     public dy: number = 0;
 
@@ -161,6 +136,9 @@ export class BasicBox implements Device {
     interrupt(intr: EVENTS) {
         this.OS.handlerInterrupt(intr);
     }
+
+    SignalIn(packet: Packet) {
+    }
 }
 
 class Status {
@@ -169,7 +147,7 @@ class Status {
     private text: Snap.Element;
     private box: Snap.Element;
 
-    constructor(private device: Device, private x: number, private y: number) {
+    constructor(private device: IDevice, private x: number, private y: number) {
         this.x += 20;
         this.y += 20;
     }

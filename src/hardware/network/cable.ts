@@ -1,47 +1,30 @@
-import {Device} from "../basic_box";
+import {IDevice} from "../interfaces/IDevice";
 import {Memory, World} from "../../index";
 import {EVENTS} from "../../software/hwInterrupts/events";
-import {NetworkDriver, Packet} from "../../software/base/os";
+import {Packet} from "../../software/base/os";
+import {Subject} from "rxjs/Subject";
+import {INetworkMedium} from "../interfaces/INetworkMedium";
 
 export enum ConnectionType {
     ONE2ONE,
     ONE2MANY
-
 }
 
-export interface NetworkMedium {
-    devices: Device[];
-    limit: number;
-    drivers: {
-        [id: string]: NetworkDriver;
-    };
+export class Cable implements INetworkMedium {
 
-    canHandleMoreDevices(): boolean;
+    signal(data: Packet, device: IDevice) {}
 
-    add(device: Device);
-
-    render();
-
-    signal(data: Packet, device: Device);
-}
-
-export class Cable implements NetworkMedium {
-
-    signal(data: Packet, device: Device) {
-        this.drivers[device.id].receiveDataPacket(data);
-    }
-
-    devices: Device[] = [];
-    drivers: {[id: string]: NetworkDriver} = {};
+    devices: IDevice[] = [];
     inst: Snap.Element;
     limit: number = 2;
+    private medium: Subject<Packet> = new Subject<Packet>();
 
     constructor() {
         Memory.add('pendingConnection', this);
         World.pendingConnection = true;
     }
 
-    add(device: Device) {
+    add(device: IDevice) {
         /**
          * check if this network can handle more devices,
          * if it can, try to connect
@@ -50,9 +33,9 @@ export class Cable implements NetworkMedium {
 
             /**
              * see if this device is already connected to this medium.
-             * @type {Device[]}
+             * @type {IDevice[]}
              */
-            let hasThisDeviceConnected = this.devices.filter((_device: Device) => {
+            let hasThisDeviceConnected = this.devices.filter((_device: IDevice) => {
                 return device.id == _device.id;
             })
 
@@ -64,6 +47,7 @@ export class Cable implements NetworkMedium {
              * otherwise connect to this network.
              */
             this.devices.push(device);
+            this.medium.asObservable().subscribe(() => device.interrupt(EVENTS.CONNECTION_ESTABLISHED));
         }
 
         /**
@@ -90,7 +74,7 @@ export class Cable implements NetworkMedium {
             /**
              * register connection to each device.
              */
-            this.devices.forEach((_device: Device) => {
+            this.devices.forEach((_device: IDevice) => {
                 _device.connection.push(this);
                 _device.interrupt(EVENTS.CONNECTION_ESTABLISHED);
             })

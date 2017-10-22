@@ -1,13 +1,13 @@
 import {OS_MODES} from "../os";
-import {Device} from "../../hardware/basic_box";
+import {IDevice} from "../../hardware/interfaces/IDevice";
 import {DangerousHTML} from "../kernal/command";
-import {NetworkMedium} from "../../hardware/network/cable";
+import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
 import {EVENTS} from "../hwInterrupts/events";
 
 export interface OS {
     gui: OSGUI;
     mode: OS_MODES;
-    machine: Device;
+    machine: IDevice;
 
     commandReceived(command: string): Promise<DangerousHTML>;
 

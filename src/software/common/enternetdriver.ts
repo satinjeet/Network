@@ -1,17 +1,16 @@
 import {Network, NetworkDriver, Packet} from "../base/os";
-import {NetworkMedium} from "../../hardware/network/cable";
-import {Device} from "../../hardware/basic_box";
+import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
+import {IDevice} from "../../hardware/interfaces/IDevice";
 
 export class EthernetDriver implements NetworkDriver {
-    connectedDevice: Device;
-    myDevice: Device;
+    connectedDevice: IDevice;
+    myDevice: IDevice;
 
     private unresolvedPromise: Promise<any>;
 
-    constructor(connectedDevice: Device, myDevice: Device, private medium: NetworkMedium) {
+    constructor(connectedDevice: IDevice, myDevice: IDevice, private medium: INetworkMedium) {
         this.connectedDevice = connectedDevice;
         this.myDevice = myDevice;
-        this.medium.drivers[this.myDevice.id] = this;
     }
 
     signPacket(packet: Packet): Packet {
@@ -21,48 +20,8 @@ export class EthernetDriver implements NetworkDriver {
         return packet;
     }
 
-    sendDataPacket(packet): Promise<any> {
-        this.unresolvedPromise = new Promise((res, rej) => {
-            /**
-             * simulate connection for now.
-             *
-             * randomly respond to ping within 0.1 - 1 sec.
-             */
-            // let n = (Math.random() * 10 + 1) * 100;
-            // setTimeout(() => {
-            //     res({
-            //         connected: true,
-            //         pingTime: n
-            //     });
-            // }, n);
+    sendDataPacket(packet): void {}
 
-            /**
-             * code actual connection
-             */
-            this.medium.signal(packet, this.connectedDevice);
-        });
-
-        return this.unresolvedPromise;
-    }
-
-    receiveDataPacket(packet: Packet) {
-        console.log('Packet received', this.myDevice.id, packet);
-
-        if (packet.data == "ping") {
-            this.medium.signal(this.signPacket({
-                data: 'ping received',
-                sender: this.myDevice.id,
-                receiver: this.connectedDevice.id
-            } as Packet), this.connectedDevice);
-        }
-
-        if (packet.data == "ping received") {
-            debugger
-            if (this.unresolvedPromise) {
-                Promise.resolve(this.unresolvedPromise);
-                this.unresolvedPromise = undefined;
-            }
-        }
-    }
+    receiveDataPacket(packet: Packet): void {}
 
 }

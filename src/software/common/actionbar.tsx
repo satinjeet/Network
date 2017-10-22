@@ -1,9 +1,9 @@
-import {Device} from "../../hardware/basic_box";
+import {IDevice} from "../../hardware/interfaces/IDevice";
 import * as React from "react";
 
 interface ActionBarProps {
     closeHook: Function;
-    device: Device;
+    device: IDevice;
 }
 
 export class ActionsBar extends React.Component<ActionBarProps, any> {
