@@ -12,7 +12,9 @@ export enum ConnectionType {
 
 export class Cable implements INetworkMedium {
 
-    signal(data: Packet, device: IDevice) {}
+    signal(data: Packet, device: IDevice) {
+        this.medium.next(data);
+    }
 
     devices: IDevice[] = [];
     inst: Snap.Element;
@@ -47,7 +49,10 @@ export class Cable implements INetworkMedium {
              * otherwise connect to this network.
              */
             this.devices.push(device);
-            this.medium.asObservable().subscribe(() => device.interrupt(EVENTS.CONNECTION_ESTABLISHED));
+            this.medium.asObservable().subscribe((data: Packet) => {
+                if (device.id == data.receiver)
+                    device.interrupt(data.data);
+            });
         }
 
         /**

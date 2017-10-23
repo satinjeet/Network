@@ -1,5 +1,6 @@
 import {Network, Packet} from "../../base/os";
 import {Command, DangerousHTML} from "../command";
+import {EVENTS} from "../../hwInterrupts/events";
 
 export class PingCommand implements Command {
 
@@ -43,19 +44,9 @@ export class PingCommand implements Command {
             return new Promise((res, rej) =>{
                 driver.driver.sendDataPacket(
                     driver.driver.signPacket({
-                        data: 'ping'
+                        data: EVENTS.PING_REQUESTED
                     } as Packet)
-                ).then((response) => {
-                    let {connected, pingTime} = response;
-                    res({
-                        __html: `Device connected, ping time ${pingTime / 1000} sec.`
-                    })
-                }).catch(() => {
-                    rej({
-                        status: 1,
-                        message: `Device ${this.addr} not connected.`
-                    })
-                })
+                )
             })
         }
     }

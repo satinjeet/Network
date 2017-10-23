@@ -55,7 +55,7 @@ export class BasicOS extends Kernal implements OS, Network {
                 if (_dev.id != this.machine.id) {
                     this.networkMap.push({
                         addr: _dev.id,
-                        driver: new EthernetDriver(_dev, this.machine, _connection)
+                        driver: new EthernetDriver(_dev, this, _connection)
                     })
                 }
             })
@@ -63,8 +63,17 @@ export class BasicOS extends Kernal implements OS, Network {
     }
 
     handlerInterrupt(intr: EVENTS) {
-        console.log('revieved interrupt', intr);
-        this.nmap(true);
+        console.log('received interrupt', intr);
+
+        switch (intr) {
+            case EVENTS.CONNECTION_ESTABLISHED:
+                this.nmap(true);
+                break;
+            case EVENTS.PING_REQUESTED:
+                break;
+            case EVENTS.PING_RESPONSE:
+                break;
+        }
     }
 
     createDataPacket(data: any): Packet {
