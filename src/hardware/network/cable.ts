@@ -49,10 +49,6 @@ export class Cable implements INetworkMedium {
              * otherwise connect to this network.
              */
             this.devices.push(device);
-            this.medium.asObservable().subscribe((data: Packet) => {
-                if (device.id == data.receiver)
-                    device.interrupt(data.data);
-            });
         }
 
         /**
