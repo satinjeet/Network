@@ -3,7 +3,6 @@ import {generateHDWId, getRandomName} from "./utility/utils";
 import {Memory, World} from "../index";
 import {Cable} from "./network/cable";
 import {EVENTS} from "../software/hwInterrupts/events";
-import {Packet} from "../software/base/os";
 import {IDevice} from "./interfaces/IDevice";
 import {INetworkMedium} from "./interfaces/INetworkMedium";
 
@@ -135,9 +134,6 @@ export class BasicBox implements IDevice {
 
     interrupt(intr: EVENTS) {
         this.OS.handlerInterrupt(intr);
-    }
-
-    SignalIn(packet: Packet) {
     }
 }
 

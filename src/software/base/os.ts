@@ -3,6 +3,7 @@ import {IDevice} from "../../hardware/interfaces/IDevice";
 import {DangerousHTML} from "../kernal/command";
 import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
 import {EVENTS} from "../hwInterrupts/events";
+import {MessageDirection} from "./types";
 
 export interface OS {
     gui: OSGUI;
@@ -19,13 +20,6 @@ export interface OS {
      * handle hardware interrupts
      */
     handlerInterrupt(intr: EVENTS);
-}
-
-export interface Packet {
-    sender: string;
-    receiver: string;
-
-    data: any;
 }
 
 export interface NetworkDriver {
