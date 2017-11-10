@@ -3,9 +3,10 @@ import {IDevice} from "../hardware/interfaces/IDevice";
 import {DangerousHTML, Kernal} from "./kernal/command";
 import {World} from "../index";
 import {INetworkMedium} from "../hardware/interfaces/INetworkMedium";
-import {Network, NetworkDriver, OS, Packet} from "./base/os";
+import {Network, NetworkDriver, OS } from "./base/os";
 import {EthernetDriver} from "./common/enternetdriver";
 import {EVENTS} from "./hwInterrupts/events";
+import {IPacket} from "./base/packet";
 
 export enum OS_MODES {
     MODE_GUI,
@@ -76,11 +77,11 @@ export class BasicOS extends Kernal implements OS, Network {
         }
     }
 
-    createDataPacket(data: any): Packet {
+    createDataPacket(data: any): IPacket {
         return {
             data,
             sender: undefined,
             receiver: undefined
-        } as Packet;
+        } as IPacket;
     }
 }

@@ -4,6 +4,7 @@ import {DangerousHTML} from "../kernal/command";
 import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
 import {EVENTS} from "../hwInterrupts/events";
 import {MessageDirection} from "./types";
+import {IPacket} from "./packet";
 
 export interface OS {
     gui: OSGUI;
@@ -24,11 +25,11 @@ export interface OS {
 
 export interface NetworkDriver {
 
-    signPacket(packet: Packet): Packet;
+    signPacket(packet: IPacket): IPacket;
 
-    sendDataPacket(packet);
+    sendDataPacket(packet: IPacket);
 
-    receiveDataPacket(packet);
+    receiveDataPacket(packet: IPacket);
 }
 
 export interface Network {
@@ -37,7 +38,7 @@ export interface Network {
      */
     networkMap: {addr: string, driver: NetworkDriver}[];
 
-    createDataPacket(data: any): Packet;
+    createDataPacket(data: any): IPacket;
 }
 
 

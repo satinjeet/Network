@@ -1,4 +1,4 @@
-import {Network, Packet} from "../../base/os";
+import {Network} from "../../base/os";
 import {Command, DangerousHTML} from "../command";
 import {EVENTS} from "../../hwInterrupts/events";
 
@@ -42,11 +42,7 @@ export class PingCommand implements Command {
             });
         } else {
             return new Promise((res, rej) =>{
-                driver.driver.sendDataPacket(
-                    driver.driver.signPacket({
-                        data: EVENTS.PING_REQUESTED
-                    } as Packet)
-                )
+
             })
         }
     }

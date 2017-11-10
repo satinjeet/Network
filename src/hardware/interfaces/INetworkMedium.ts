@@ -1,5 +1,5 @@
 import {IDevice} from "./IDevice";
-import {Packet} from "../../software/base/os";
+import {IPacket} from "../../software/base/packet";
 
 export interface INetworkMedium {
     devices: IDevice[];
@@ -11,5 +11,5 @@ export interface INetworkMedium {
 
     render();
 
-    signal(data: Packet, device: IDevice);
+    signal(data: IPacket, device: IDevice);
 }

@@ -1,9 +1,9 @@
 import {IDevice} from "../interfaces/IDevice";
 import {Memory, World} from "../../index";
 import {EVENTS} from "../../software/hwInterrupts/events";
-import {Packet} from "../../software/base/os";
 import {Subject} from "rxjs/Subject";
 import {INetworkMedium} from "../interfaces/INetworkMedium";
+import {IPacket} from "../../software/base/packet";
 
 export enum ConnectionType {
     ONE2ONE,
@@ -12,14 +12,14 @@ export enum ConnectionType {
 
 export class Cable implements INetworkMedium {
 
-    signal(data: Packet, device: IDevice) {
+    signal(data: IPacket, device: IDevice) {
         this.medium.next(data);
     }
 
     devices: IDevice[] = [];
     inst: Snap.Element;
     limit: number = 2;
-    private medium: Subject<Packet> = new Subject<Packet>();
+    private medium: Subject<IPacket> = new Subject<IPacket>();
 
     constructor() {
         Memory.add('pendingConnection', this);

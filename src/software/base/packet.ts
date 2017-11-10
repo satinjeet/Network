@@ -20,7 +20,7 @@ export interface IPacket {
     isValid(): boolean;
 }
 
-class Packet implements IPacket {
+export class Packet implements IPacket {
     sender: string;
     receiver: string;
 
