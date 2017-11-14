@@ -5,6 +5,7 @@ import {IPacket, Packet} from "../base/packet";
 import {IDictionary} from "../../common/utils";
 
 export class EthernetDriver implements NetworkDriver {
+    type: string = "Ethernet";
     medium: INetworkMedium;
     jobQueue: IDictionary<NetWorkQueueJob> = {};
     connectedDevice: IDevice;

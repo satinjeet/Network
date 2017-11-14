@@ -30,7 +30,7 @@ export class BasicOS extends Kernal implements OS, Network {
         }
     }
 
-    networkMap: { addr: string, driver: NetworkDriver }[] = [];
+    networkMap: { addr: string, driver: NetworkDriver, name: string }[] = [];
 
     gui: any;
     mode = OS_MODES.MODE_CONSOLE;
@@ -72,7 +72,8 @@ export class BasicOS extends Kernal implements OS, Network {
                 if (_dev.id != this.machine.id) {
                     this.networkMap.push({
                         addr: _dev.id,
-                        driver: new EthernetDriver(_dev, this, _connection)
+                        driver: new EthernetDriver(_dev, this, _connection),
+                        name: _dev.name
                     })
                 }
             })

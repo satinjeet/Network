@@ -52,6 +52,8 @@ export interface NetworkDriver {
 
     medium: INetworkMedium;
 
+    type: string;
+
     signPacket(packet: IPacket): IPacket;
 
     sendDataPacket(packet: IPacket);

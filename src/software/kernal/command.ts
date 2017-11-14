@@ -1,6 +1,7 @@
 import {TimedTasks} from "../base/clock";
 import {OS} from "../base/os";
 import {PingCommand} from "./commands/ping";
+import {NMap} from "./commands/nmap";
 
 export enum Commands {
     COMMAND_HELP
@@ -40,7 +41,7 @@ export class CommandStructure {
 
     static map: Object = {
         'help': HelpCommand,
-        'nmap': HelpCommand,
+        'nmap': NMap,
         'ping': PingCommand
     }
 

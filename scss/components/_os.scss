@@ -15,6 +15,14 @@
 
     &:focus { outline: none; }
   }
+
+  table {
+    tr {
+      td {
+        padding: 10px;
+      }
+    }
+  }
 }
 
 .actions-bar {
