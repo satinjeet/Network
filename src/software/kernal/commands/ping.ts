@@ -4,6 +4,8 @@ import {EVENTS} from "../../hwInterrupts/events";
 import {IPacket, Packet, PacketTypePing} from "../../base/packet";
 import {MessageDirection} from "../../base/types";
 import {uuid} from "../../../common/utils";
+import {SubjectSubscriber} from "rxjs/Subject";
+import {Subscription} from "rxjs/Subscription";
 
 export class PingCommand implements Command {
 
@@ -45,25 +47,27 @@ export class PingCommand implements Command {
             });
         } else {
             return new Promise((res, rej) =>{
-                debugger
                 let k = [1,2,3,4];
                 let op: string = uuid();
                 let jq: NetWorkQueueJob = new NetWorkQueueJob();
+                let resp: string[] = [];
+                let subscription: Subscription;
+                let timers: number[] = [];
+
                 driver.driver.jobQueue[op] = jq;
 
-                let resp: string[] = [];
-
-                driver.driver.medium.subscribe((p: IPacket) => {
+                subscription = driver.driver.medium.subscribe((p: IPacket) => {
                     if (p.direction == MessageDirection.TO) {
                         driver.driver.jobQueue[p.data].Remove();
 
                         if (driver.driver.jobQueue[p.data].Completed) {
-                            resp.push(`ping received`);
+                            let diff: number = (new Date().getTime()) - timers.shift();
+                            resp.push(`Device connected, ping time ${diff/100} sec.`);
                         }
                     }
                 })
 
-                Object.assign([],k).map((i) => {
+                Object.assign([],k).map((i, index) => {
                     jq.Job = i;
                     let p = new Packet();
                     p.type = new PacketTypePing();
@@ -71,9 +75,11 @@ export class PingCommand implements Command {
                     p.direction = MessageDirection.FROM;
 
                     p = driver.driver.signPacket(p);
+                    timers.push(new Date().getTime());
                     driver.driver.sendDataPacket(p);
                 });
 
+                subscription.unsubscribe();
                 res({
                     __html: resp.join("<br>")
                 });
