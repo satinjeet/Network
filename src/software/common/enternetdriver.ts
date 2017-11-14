@@ -1,17 +1,21 @@
-import {Network, NetworkDriver, OS } from "../base/os";
+import {Network, NetworkDriver, NetWorkQueueJob, OS} from "../base/os";
 import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
 import {IDevice} from "../../hardware/interfaces/IDevice";
 import {IPacket, Packet} from "../base/packet";
+import {IDictionary} from "../../common/utils";
 
 export class EthernetDriver implements NetworkDriver {
+    medium: INetworkMedium;
+    jobQueue: IDictionary<NetWorkQueueJob> = {};
     connectedDevice: IDevice;
     myDevice: OS;
 
     private unresolvedPromise: Promise<any>;
 
-    constructor(connectedDevice: IDevice, myDevice: OS, private medium: INetworkMedium) {
+    constructor(connectedDevice: IDevice, myDevice: OS, medium: INetworkMedium) {
         this.connectedDevice = connectedDevice;
         this.myDevice = myDevice;
+        this.medium = medium;
     }
 
     signPacket(packet: IPacket): IPacket {

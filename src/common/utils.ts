@@ -4,3 +4,11 @@ export function hasValue(variable: any) {
         variable != null &&
         variable != ""
 }
+
+export interface IDictionary<T> {
+    [key: string]: T;
+}
+
+export function uuid() {
+    return `OP_${Math.random()}_${Math.random()}`
+}

@@ -6,7 +6,8 @@ import {INetworkMedium} from "../hardware/interfaces/INetworkMedium";
 import {Network, NetworkDriver, OS } from "./base/os";
 import {EthernetDriver} from "./common/enternetdriver";
 import {EVENTS} from "./hwInterrupts/events";
-import {IPacket} from "./base/packet";
+import {IPacket, Packet, PacketTypePing} from "./base/packet";
+import {MessageDirection} from "./base/types";
 
 export enum OS_MODES {
     MODE_GUI,
@@ -14,6 +15,21 @@ export enum OS_MODES {
 }
 
 export class BasicOS extends Kernal implements OS, Network {
+    recieveDataPacket(p: IPacket) {
+        let nmap = this.networkMap.find(dr => dr.addr == p.sender);
+
+        if (p.direction == MessageDirection.FROM) {
+            console.log('I got ping', p);
+            let p_ = new Packet();
+            p_.type = new PacketTypePing();
+            p_.data = p.data;
+            p_.direction = MessageDirection.TO;
+
+            p = nmap.driver.signPacket(p_);
+            nmap.driver.sendDataPacket(p_);
+        }
+    }
+
     networkMap: { addr: string, driver: NetworkDriver }[] = [];
 
     gui: any;

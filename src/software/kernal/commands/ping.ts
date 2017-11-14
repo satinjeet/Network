@@ -1,6 +1,9 @@
-import {Network} from "../../base/os";
+import {Network, NetWorkQueueJob} from "../../base/os";
 import {Command, DangerousHTML} from "../command";
 import {EVENTS} from "../../hwInterrupts/events";
+import {IPacket, Packet, PacketTypePing} from "../../base/packet";
+import {MessageDirection} from "../../base/types";
+import {uuid} from "../../../common/utils";
 
 export class PingCommand implements Command {
 
@@ -42,7 +45,38 @@ export class PingCommand implements Command {
             });
         } else {
             return new Promise((res, rej) =>{
+                debugger
+                let k = [1,2,3,4];
+                let op: string = uuid();
+                let jq: NetWorkQueueJob = new NetWorkQueueJob();
+                driver.driver.jobQueue[op] = jq;
 
+                let resp: string[] = [];
+
+                driver.driver.medium.subscribe((p: IPacket) => {
+                    if (p.direction == MessageDirection.TO) {
+                        driver.driver.jobQueue[p.data].Remove();
+
+                        if (driver.driver.jobQueue[p.data].Completed) {
+                            resp.push(`ping received`);
+                        }
+                    }
+                })
+
+                Object.assign([],k).map((i) => {
+                    jq.Job = i;
+                    let p = new Packet();
+                    p.type = new PacketTypePing();
+                    p.data = op;
+                    p.direction = MessageDirection.FROM;
+
+                    p = driver.driver.signPacket(p);
+                    driver.driver.sendDataPacket(p);
+                });
+
+                res({
+                    __html: resp.join("<br>")
+                });
             })
         }
     }

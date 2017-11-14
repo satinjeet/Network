@@ -3,7 +3,8 @@ import {Memory, World} from "../../index";
 import {EVENTS} from "../../software/hwInterrupts/events";
 import {Subject} from "rxjs/Subject";
 import {INetworkMedium} from "../interfaces/INetworkMedium";
-import {IPacket} from "../../software/base/packet";
+import {IPacket, Packet} from "../../software/base/packet";
+import {Subscription} from "rxjs/Subscription";
 
 export enum ConnectionType {
     ONE2ONE,
@@ -78,9 +79,16 @@ export class Cable implements INetworkMedium {
             this.devices.forEach((_device: IDevice) => {
                 _device.connection.push(this);
                 _device.interrupt(EVENTS.CONNECTION_ESTABLISHED);
+                this.medium.asObservable().subscribe((data: Packet) => {
+                    _device.readPacket(data);
+                })
             })
             this.render();
         }
+    }
+
+    subscribe(cb): Subscription {
+        return this.medium.asObservable().subscribe(cb);
     }
 
     canHandleMoreDevices(): boolean {

@@ -5,8 +5,18 @@ import {Cable} from "./network/cable";
 import {EVENTS} from "../software/hwInterrupts/events";
 import {IDevice} from "./interfaces/IDevice";
 import {INetworkMedium} from "./interfaces/INetworkMedium";
+import {IPacket} from "../software/base/packet";
+import {MessageDirection} from "../software/base/types";
 
 export class BasicBox implements IDevice {
+    readPacket(p: IPacket) {
+
+        if (p.receiver == this.id) {
+            this.OS.recieveDataPacket(p);
+        }
+
+    }
+
     public OS: BasicOS;
     public id: string = generateHDWId();
     public name: string = getRandomName();

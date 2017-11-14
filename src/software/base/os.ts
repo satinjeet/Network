@@ -4,7 +4,8 @@ import {DangerousHTML} from "../kernal/command";
 import {INetworkMedium} from "../../hardware/interfaces/INetworkMedium";
 import {EVENTS} from "../hwInterrupts/events";
 import {MessageDirection} from "./types";
-import {IPacket} from "./packet";
+import {IPacket, Packet} from "./packet";
+import {IDictionary} from "../../common/utils";
 
 export interface OS {
     gui: OSGUI;
@@ -23,7 +24,33 @@ export interface OS {
     handlerInterrupt(intr: EVENTS);
 }
 
+export class NetWorkQueueJob {
+    private _queue: any[] = [];
+    private isComplete: boolean = false;
+
+    public get Completed(): Boolean {
+        return this.isComplete;
+    }
+
+    public set Job(job: any) {
+        this._queue.push(job);
+    }
+
+    public Remove() {
+        this._queue.pop();
+
+        if (this._queue.length == 0) {
+            this.isComplete = true;
+        }
+    }
+
+}
+
 export interface NetworkDriver {
+
+    jobQueue: IDictionary<NetWorkQueueJob>;
+
+    medium: INetworkMedium;
 
     signPacket(packet: IPacket): IPacket;
 
@@ -39,6 +66,8 @@ export interface Network {
     networkMap: {addr: string, driver: NetworkDriver}[];
 
     createDataPacket(data: any): IPacket;
+
+    recieveDataPacket(p: IPacket);
 }
 
 
