@@ -6,23 +6,19 @@ import {EVENTS} from "../software/hwInterrupts/events";
 import {IDevice} from "./interfaces/IDevice";
 import {INetworkMedium} from "./interfaces/INetworkMedium";
 import {IPacket} from "../software/base/packet";
-import {MessageDirection} from "../software/base/types";
+import {IRedrawable, IRenderable} from "./interfaces/IRenderable";
+import {hasValue} from "../common/utils";
 
-export class BasicBox implements IDevice {
-    readPacket(p: IPacket) {
-
-        if (p.receiver == this.id) {
-            this.OS.recieveDataPacket(p);
-        }
-
-    }
+export class BasicBox implements IDevice, IRedrawable {
 
     public OS: BasicOS;
     public id: string = generateHDWId();
     public name: string = getRandomName();
+    public displayName: string = this.name;
     public connection: INetworkMedium[] = [];
     public dx: number = 0;
     public dy: number = 0;
+    public type: string = "Basic Box";
 
     private inst: Snap.Element;
 
@@ -68,13 +64,19 @@ export class BasicBox implements IDevice {
             e.stopPropagation();
 
             /**
-             * no connection is being created, do not care for this event.
+             * no connection is being created, allow renaming this device.
              */
-            if (!World.pendingConnection) return;
-
-            if (World.pendingConnection) {
-                (Memory.mem['pendingConnection'] as Cable).add(this);
-                console.log(Memory.mem)
+            if (!World.pendingConnection) {
+                let newName = prompt("Rename the device to ?", this.displayName);
+                if (hasValue(newName)) {
+                    this.displayName = newName;
+                }
+            } else {
+                // connection is pending and attach it to current device.
+                if (World.pendingConnection) {
+                    (Memory.mem['pendingConnection'] as Cable).add(this);
+                    console.log(Memory.mem)
+                }
             }
         })
 
@@ -101,7 +103,7 @@ export class BasicBox implements IDevice {
         this.inst.drag(this.move, this.start, this.stop);
     }
 
-    redrawConnections() {
+    update() {
         this.connection.forEach((_con) => {
             _con.render();
         })
@@ -114,7 +116,7 @@ export class BasicBox implements IDevice {
         this.inst.attr({
             transform: this.inst.data('origTransform') + (this.inst.data('origTransform') ? "T" : "t") + [dx, dy]
         });
-        this.redrawConnections();
+        this.update();
     }
 
     start = () => {
@@ -145,13 +147,21 @@ export class BasicBox implements IDevice {
     interrupt(intr: EVENTS) {
         this.OS.handlerInterrupt(intr);
     }
+
+    readPacket(p: IPacket) {
+
+        if (p.receiver == this.id) {
+            this.OS.recieveDataPacket(p);
+        }
+
+    }
 }
 
-class Status {
+class Status implements IRenderable {
 
     private inst: Snap.Element;
-    private text: Snap.Element;
-    private box: Snap.Element;
+    // private text: Snap.Element;
+    // private box: Snap.Element;
 
     constructor(private device: IDevice, private x: number, private y: number) {
         this.x += 20;
@@ -165,11 +175,19 @@ class Status {
     }
 
     render() {
-        this.box = World.stage().rect(this.x, this.y, 200, 100);
-        this.box.attr({ fill: "white", opacity: "0.4", stroke: "black", strokeWidth: "2" });
-        this.text = World.stage().text(this.x + 5, this.y + 20, this.device.name);
-        this.text.attr({fontFamily: 'monospace'});
-        this.inst = World.stage().group(this.box, this.text);
+        let box = World.stage().rect(this.x, this.y, 200, 100);
+        let text: Snap.Element[] = [
+            World.stage().text(this.x + 5, this.y + 20, this.device.displayName),
+            World.stage().text(this.x + 5, this.y + 40, `Machine-type: ${this.device.type}`),
+            World.stage().text(this.x + 5, this.y + 60, `Running OS: ${this.device.OS.type}`),
+            World.stage().text(this.x + 5, this.y + 80, `H/W Address: ${this.device.id}`),
+        ];
+
+
+        box.attr({ fill: "white", opacity: "0.4", stroke: "black", strokeWidth: "2" });
+        text.forEach(_t => {_t.attr({fontFamily: 'monospace'})});
+
+        this.inst = World.stage().group(box, ...text);
     }
 
     destroy() {

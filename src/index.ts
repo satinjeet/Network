@@ -2,8 +2,6 @@ import {registerEvents} from "./events";
 import * as Snap from 'snapsvg';
 import {Messagebox} from "./appui/messagebox";
 
-
-
 let l = Snap(window.innerWidth, window.innerHeight);
 
 export class Memory {

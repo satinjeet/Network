@@ -8,13 +8,14 @@ import {EthernetDriver} from "./common/enternetdriver";
 import {EVENTS} from "./hwInterrupts/events";
 import {IPacket, Packet, PacketTypePing} from "./base/packet";
 import {MessageDirection} from "./base/types";
+import {IDefineType} from "../hardware/interfaces/IDefineType";
 
 export enum OS_MODES {
     MODE_GUI,
     MODE_CONSOLE
 }
 
-export class BasicOS extends Kernal implements OS, Network {
+export class BasicOS extends Kernal implements OS, Network, IDefineType {
     recieveDataPacket(p: IPacket) {
         let nmap = this.networkMap.find(dr => dr.addr == p.sender);
 
@@ -30,11 +31,13 @@ export class BasicOS extends Kernal implements OS, Network {
         }
     }
 
-    networkMap: { addr: string, driver: NetworkDriver, name: string }[] = [];
+    public networkMap: { addr: string, driver: NetworkDriver, name: string }[] = [];
 
-    gui: any;
-    mode = OS_MODES.MODE_CONSOLE;
-    ttyl:number = 60*1000;
+    public gui: any;
+    public mode = OS_MODES.MODE_CONSOLE;
+    public ttyl:number = 60*1000;
+    public type: string = "Network OS - Console";
+
     private ttylCache: number;
 
     constructor(public machine: IDevice) {
