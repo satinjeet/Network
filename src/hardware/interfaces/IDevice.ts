@@ -3,9 +3,10 @@ import {INetworkMedium} from "./INetworkMedium";
 import {EVENTS} from "../../software/hwInterrupts/events";
 import {IPacket} from "../../software/base/packet";
 import {IDefineType} from "./IDefineType";
+import {OS} from "../../software/base/os";
 
 export interface IDevice extends IDefineType {
-    OS: BasicOS;
+    OS: OS;
 
     id: string;
     name: string;

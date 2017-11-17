@@ -1,5 +1,6 @@
 import * as React from "react";
 import {ReactDOM} from "react";
+import {IRenderable} from "../interfaces/IRenderable";
 
 class Status extends React.Component<any, any> {
     state = {
@@ -21,5 +22,4 @@ class StatusWindow extends React.Component<any, any> {
         </div>
     }
 }
-
 // export ReactDOM.render(<Status/>)

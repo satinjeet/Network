@@ -15,8 +15,8 @@ export enum OS_MODES {
     MODE_CONSOLE
 }
 
-export class BasicOS extends Kernal implements OS, Network, IDefineType {
-    recieveDataPacket(p: IPacket) {
+export class BasicOS extends Kernal implements OS, Network {
+    receiveDataPacket(p: IPacket) {
         let nmap = this.networkMap.find(dr => dr.addr == p.sender);
 
         if (p.direction == MessageDirection.FROM) {

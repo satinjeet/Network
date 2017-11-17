@@ -1,4 +1,5 @@
 export interface IRenderable {
+    inst: Snap.Element;
     render(): void;
 }
 

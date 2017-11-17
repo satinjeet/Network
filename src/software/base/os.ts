@@ -6,8 +6,9 @@ import {EVENTS} from "../hwInterrupts/events";
 import {MessageDirection} from "./types";
 import {IPacket, Packet} from "./packet";
 import {IDictionary} from "../../common/utils";
+import {IDefineType} from "../../hardware/interfaces/IDefineType";
 
-export interface OS {
+export interface OS extends IDefineType {
     gui: OSGUI;
     mode: OS_MODES;
     machine: IDevice;
@@ -22,6 +23,8 @@ export interface OS {
      * handle hardware interrupts
      */
     handlerInterrupt(intr: EVENTS);
+
+
 }
 
 export class NetWorkQueueJob {
@@ -69,7 +72,7 @@ export interface Network {
 
     createDataPacket(data: any): IPacket;
 
-    recieveDataPacket(p: IPacket);
+    receiveDataPacket(p: IPacket);
 }
 
 
